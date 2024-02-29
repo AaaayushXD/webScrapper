@@ -213,26 +213,21 @@ const getSchedule = async () => {
       const circuitDetail = await getCircuit(circuitId);
       const circuit = { circuitDetail, url, locality, country };
 
-      const [raceDate, raceTime] = localDateConverter(date, time);
+      const [raceDate, raceTime] = localDateConverter(date, time) || "N/A";
 
-      const [firstPracDate, firstPracTime] = localDateConverter(
-        FirstPractice.date,
-        FirstPractice.time
-      );
-      const [secondPracDate, secondPracTime] = localDateConverter(
-        SecondPractice.date,
-        SecondPractice.time
-      );
-      const [qualifyingDate, qualifyingTime] = localDateConverter(
-        Qualifying.date,
-        Qualifying.time
-      );
+      const [firstPracDate, firstPracTime] =
+        localDateConverter(FirstPractice?.date, FirstPractice?.time) || "N/A";
+      const [secondPracDate, secondPracTime] =
+        localDateConverter(SecondPractice?.date, SecondPractice?.time) || "N/A";
+      const [qualifyingDate, qualifyingTime] =
+        localDateConverter(Qualifying?.date, Qualifying?.time) || "N/A";
       const normalWeekEnd =
-        ThirdPractice &&
-        localDateConverter(ThirdPractice.date, ThirdPractice.time);
+        (ThirdPractice &&
+          localDateConverter(ThirdPractice.date, ThirdPractice.time)) ||
+        "N/A";
 
       const sprintWeekEnd =
-        Sprint && localDateConverter(Sprint.date, Sprint.time);
+        (Sprint && localDateConverter(Sprint.date, Sprint.time)) || "N/A";
 
       const raceSchedule = [
         { FirstPracticeSession: { firstPracDate, firstPracTime } },
@@ -246,8 +241,8 @@ const getSchedule = async () => {
             }
           : {
               SprintSession: {
-                sprintDate: sprintWeekEnd[0],
-                sprintTime: sprintWeekEnd[1],
+                sprintDate: sprintWeekEnd && sprintWeekEnd[0],
+                sprintTime: sprintWeekEnd && sprintWeekEnd[1],
               },
             },
         { Qualifying: { qualifyingDate, qualifyingTime } },
@@ -265,11 +260,11 @@ const getChampions = async () => {
   const champions = [];
 };
 
-// getSchedule();
-// storeCircuitData();
-// scrapeTeamStanding();
-// scrapNewsAndStore();
-// scrapeDriverStanding();
+getSchedule();
+storeCircuitData();
+scrapeTeamStanding();
+scrapNewsAndStore();
+scrapeDriverStanding();
 
 cron.schedule("0 0 * * *", async () => {
   await scrapNewsAndStore();
@@ -278,4 +273,4 @@ cron.schedule("0 0 * * *", async () => {
   await getSchedule();
 });
 
-app.listen(8001, () => console.log("done"));
+app.listen(4001, () => console.log("done"));
